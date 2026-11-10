@@ -1,0 +1,396 @@
+﻿<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drátěný program</title>
+<meta name="description" content="Využíváme moderních technologií, umožňujících ohýbání drátů do téměř jakéhokoliv tvaru">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+:root{
+  --bg:#0a0e13;--bg2:#0e141b;--card:#111a24;--line:rgba(255,255,255,.09);
+  --tx:#e9eef3;--mute:#8fa0b1;--or:#ff6f00;--or2:#ff9442;--bl:#3c8bb3;--bl2:#276889;
+  --ease:cubic-bezier(.2,.7,.2,1);--pad:clamp(20px,5vw,72px)
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--tx);font-family:Inter,system-ui,sans-serif;font-weight:400;line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+svg.i{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wrap{max-width:1360px;margin:0 auto;padding:0 var(--pad)}
+
+/* progress */
+.progress{position:fixed;left:0;top:0;height:3px;width:100%;background:linear-gradient(90deg,var(--or),var(--or2));transform-origin:0 50%;transform:scaleX(0);z-index:200}
+
+/* header */
+header{position:fixed;inset:0 0 auto 0;z-index:100;transition:background .5s var(--ease),backdrop-filter .5s,box-shadow .5s}
+header.solid{background:rgba(10,14,19,.78);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);box-shadow:0 1px 0 var(--line)}
+.util{display:flex;justify-content:space-between;align-items:center;gap:20px;font-size:.78rem;color:#c3cdd7;max-height:44px;overflow:hidden;transition:max-height .5s var(--ease),opacity .4s;border-bottom:1px solid var(--line)}
+header.solid .util{max-height:0;opacity:0;border-color:transparent}
+.util .wrap{display:flex;justify-content:space-between;align-items:center;height:44px;gap:20px}
+.util .motto{font-style:italic;font-weight:300;letter-spacing:.02em;color:var(--or2)}
+.util .r{display:flex;gap:22px;align-items:center}
+.util a:hover{color:#fff}
+.util .ct{display:flex;gap:8px;align-items:center}
+.util .ct svg{color:var(--or)}
+.lang{display:flex;gap:2px}
+.lang a{padding:2px 7px;border-radius:5px;font-weight:600;font-size:.7rem;letter-spacing:.06em;color:#9fb0c0}
+.lang a.on,.lang a:hover{background:rgba(255,255,255,.12);color:#fff}
+.nav{display:flex;align-items:center;justify-content:space-between;height:84px;gap:24px}
+.logo{display:block;background:#fff;border-radius:12px;padding:4px 10px;line-height:0;transition:transform .4s var(--ease)}
+.logo:hover{transform:translateY(-2px)}
+.logo img{height:48px;width:auto}
+.menu{display:flex;gap:6px}
+.menu a{position:relative;padding:10px 16px;font-weight:500;font-size:.92rem;color:#d6dee6;border-radius:8px;transition:color .3s}
+.menu a::after{content:"";position:absolute;left:16px;right:16px;bottom:5px;height:2px;background:var(--or);transform:scaleX(0);transform-origin:0 50%;transition:transform .45s var(--ease)}
+.menu a:hover{color:#fff}.menu a:hover::after{transform:scaleX(1)}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 26px;border-radius:999px;font-weight:600;font-size:.88rem;letter-spacing:.04em;text-transform:uppercase;transition:transform .4s var(--ease),background .3s,box-shadow .4s,border-color .3s;white-space:nowrap}
+.btn svg{transition:transform .4s var(--ease)}
+.btn:hover svg{transform:translateX(4px)}
+.btn-or{background:var(--or);color:#fff;box-shadow:0 10px 30px -10px rgba(255,111,0,.7)}
+.btn-or:hover{background:var(--or2);transform:translateY(-2px);box-shadow:0 16px 36px -10px rgba(255,111,0,.8)}
+.btn-gh{border:1px solid rgba(255,255,255,.28);color:#fff;backdrop-filter:blur(6px)}
+.btn-gh:hover{border-color:#fff;background:rgba(255,255,255,.08);transform:translateY(-2px)}
+.burger{display:none;width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;align-items:center;justify-content:center;font-size:1.3rem}
+.ov{position:fixed;inset:0;z-index:150;background:rgba(7,10,14,.97);backdrop-filter:blur(10px);display:flex;flex-direction:column;justify-content:center;padding:var(--pad);clip-path:circle(0 at calc(100% - 44px) 44px);transition:clip-path .7s var(--ease);pointer-events:none}
+.ov.open{clip-path:circle(150% at calc(100% - 44px) 44px);pointer-events:auto}
+.ov a.l{font-family:"Barlow Condensed",sans-serif;font-weight:600;text-transform:uppercase;font-size:clamp(2.4rem,10vw,4rem);line-height:1.25;color:#fff;display:block}
+.ov a.l:hover{color:var(--or)}
+.ov .x{position:absolute;top:22px;right:22px;width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:none;color:#fff;font-size:1.4rem;cursor:pointer}
+.ov .ct{margin-top:34px;display:flex;flex-direction:column;gap:6px;color:var(--mute)}
+
+/* hero */
+.hero{position:relative;height:100vh;height:100svh;min-height:680px;display:flex;align-items:flex-end;overflow:hidden;isolation:isolate}
+.hero video{position:absolute;inset:-6% 0;width:100%;height:112%;object-fit:cover;z-index:-3;will-change:transform}
+.hero::before{content:"";position:absolute;inset:0;z-index:-2;background:
+  linear-gradient(180deg,rgba(10,14,19,.65) 0%,rgba(10,14,19,.15) 38%,rgba(10,14,19,.55) 70%,var(--bg) 100%),
+  linear-gradient(90deg,rgba(10,14,19,.75),rgba(10,14,19,0) 65%)}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;opacity:.5;background-image:radial-gradient(rgba(255,255,255,.08) 1px,transparent 1px);background-size:4px 4px;mix-blend-mode:overlay}
+.hero-in{padding-bottom:clamp(70px,13vh,140px);width:100%}
+.eyebrow{display:inline-flex;align-items:center;gap:12px;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:var(--or2);font-weight:600;margin-bottom:26px}
+.eyebrow::before{content:"";width:44px;height:2px;background:var(--or)}
+h1{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;line-height:.96;letter-spacing:.005em;font-size:clamp(2.5rem,6.2vw,5.9rem);max-width:15.5em}
+h1 em{font-style:normal;color:var(--or)}
+.w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
+.w>span{display:inline-block;transform:translateY(110%);transition:transform 1.1s var(--ease);transition-delay:calc(var(--n)*55ms + 250ms)}
+.loaded .w>span{transform:none}
+.cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:40px;opacity:0;transform:translateY(20px);transition:all 1s var(--ease) 1.3s}
+.loaded .cta,.loaded .eyebrow{opacity:1;transform:none}
+.eyebrow{opacity:0;transform:translateY(14px);transition:all 1s var(--ease) .1s}
+.scroll{position:absolute;right:var(--pad);bottom:clamp(40px,8vh,80px);display:flex;flex-direction:column;align-items:center;gap:14px;font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:#cbd5de;writing-mode:vertical-rl}
+.scroll i{display:block;width:1px;height:70px;background:rgba(255,255,255,.25);position:relative;overflow:hidden}
+.scroll i::after{content:"";position:absolute;left:0;top:-40%;width:1px;height:40%;background:var(--or);animation:drip 2.2s var(--ease) infinite}
+@keyframes drip{to{top:110%}}
+
+/* sections */
+section{position:relative}
+.sec{padding:clamp(90px,14vw,170px) 0}
+h2{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;line-height:1;letter-spacing:.005em;font-size:clamp(2rem,4.6vw,4.2rem)}
+.ind-head{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-bottom:clamp(40px,6vw,70px)}
+.ind-head h2{max-width:14em}
+.ind-head h2 span{color:var(--or)}
+.ind-head .hint{color:var(--mute);font-size:.82rem;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{position:relative;grid-column:span 3;min-height:300px;padding:28px;border-radius:22px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;isolation:isolate;transition:transform .6s var(--ease),border-color .4s}
+.card:nth-child(n+5){grid-column:span 4}
+.card::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(420px circle at var(--mx,50%) var(--my,0%),rgba(255,111,0,.2),transparent 60%);opacity:0;transition:opacity .5s}
+.card:hover{transform:translateY(-6px);border-color:rgba(255,111,0,.5)}
+.card:hover::before{opacity:1}
+.card .top{display:flex;justify-content:space-between;align-items:flex-start}
+.ico{width:64px;height:64px;border-radius:16px;display:grid;place-items:center;font-size:30px;color:#fff;background:linear-gradient(145deg,var(--bl2),#1c4b66);border:2px solid var(--bl);transition:background .4s,border-color .4s,transform .6s var(--ease)}
+.card:hover .ico{background:linear-gradient(145deg,var(--or),#c24f00);border-color:var(--or2);transform:rotate(-6deg) scale(1.06)}
+.num{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:1.1rem;color:#5d6e7f;letter-spacing:.1em}
+.card h3{font-family:"Barlow Condensed",sans-serif;font-weight:600;text-transform:uppercase;font-size:clamp(1.6rem,2.3vw,2.2rem);line-height:1.05;letter-spacing:.01em}
+.card .go{position:absolute;right:26px;bottom:28px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--or);color:#fff;font-size:20px;opacity:0;transform:translate(-10px,10px) scale(.7);transition:all .5s var(--ease)}
+.card:hover .go{opacity:1;transform:none}
+
+/* machines */
+.mach{background:linear-gradient(180deg,var(--bg),var(--bg2) 25%,var(--bg2) 100%);padding-bottom:clamp(90px,12vw,150px)}
+.mhead{text-align:center;margin-bottom:clamp(50px,7vw,90px)}
+.mhead h2{font-size:clamp(2.2rem,5.4vw,5rem)}
+.ul{width:min(260px,50%);height:3px;background:rgba(255,255,255,.12);margin:26px auto 0;position:relative;overflow:hidden;border-radius:3px}
+.ul::after{content:"";position:absolute;inset:0;background:var(--or);transform:scaleX(0);transform-origin:0 50%;transition:transform 1.4s var(--ease) .3s}
+.mhead.in .ul::after{transform:scaleX(1)}
+.stack{display:flex;flex-direction:column;gap:6vh}
+.mc{position:sticky;top:calc(110px + var(--i)*22px);display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);min-height:min(540px,72vh);border-radius:30px;overflow:hidden;background:var(--card);border:1px solid var(--line);box-shadow:0 40px 80px -30px rgba(0,0,0,.8)}
+.mc .pic{position:relative;background:radial-gradient(circle at 50% 40%,#fff 0%,#e5ebf1 70%,#d7e0e9 100%);display:grid;place-items:center;overflow:hidden}
+.mc .pic img{width:min(76%,300px);height:auto;mix-blend-mode:multiply;will-change:transform;filter:drop-shadow(0 30px 30px rgba(20,40,60,.25))}
+.mc .pic b{position:absolute;left:24px;top:8px;font-family:"Barlow Condensed",sans-serif;font-size:clamp(7rem,14vw,12rem);line-height:1;color:rgba(39,104,137,.12);font-weight:700}
+.mc .txt{padding:clamp(28px,4.5vw,64px);display:flex;flex-direction:column;justify-content:center;gap:22px}
+.mc .tag{font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;color:var(--or2);font-weight:600;display:flex;gap:12px;align-items:center}
+.mc .tag::before{content:"";width:34px;height:2px;background:var(--or)}
+.mc h2{font-size:clamp(2rem,3.8vw,3.4rem)}
+.mc p{color:#b6c3d0;font-size:1.08rem;max-width:30em;font-weight:300}
+.mc .btn{align-self:flex-start;margin-top:8px}
+.mc .play{width:28px;height:28px;border-radius:50%;background:#fff;color:var(--or);display:grid;place-items:center;font-size:14px}
+
+/* footer */
+footer{background:#06090d;border-top:1px solid var(--line);padding:clamp(60px,8vw,100px) 0 0}
+.fg{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:40px;padding-bottom:60px}
+.fg h4{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;font-size:1.3rem;letter-spacing:.04em;margin-bottom:18px;font-weight:600}
+.fg p,.fg a{display:block;color:var(--mute);font-size:.95rem;line-height:1.9}
+.fg a:hover{color:var(--or2)}
+.fg .mt{margin-top:18px;color:var(--or2);font-style:italic;font-weight:300}
+.copy{border-top:1px solid var(--line);padding:22px 0;color:#5d6e7f;font-size:.82rem}
+
+/* reveal */
+.js .rv{opacity:0;transform:translateY(34px);transition:opacity 1s var(--ease),transform 1s var(--ease);transition-delay:calc(var(--d,0)*90ms)}
+.js .rv.in{opacity:1;transform:none}
+
+@media (max-width:1100px){
+  .menu,.util .motto{display:none}
+  .burger{display:flex}
+  .card,.card:nth-child(n+5){grid-column:span 6}
+  .fg{grid-template-columns:1fr 1fr}
+}
+@media (max-width:820px){
+  .util .r .ct.em{display:none}
+  .nav{height:72px}.logo img{height:40px}
+  .nav .btn{display:none}
+  .scroll{display:none}
+  .ind-head{flex-direction:column;align-items:flex-start}
+  .mc{position:relative;top:0!important;grid-template-columns:1fr}
+  .mc .pic{min-height:320px}
+  .stack{gap:24px}
+}
+@media (max-width:560px){
+  .card,.card:nth-child(n+5){grid-column:span 12;min-height:230px}
+  .fg{grid-template-columns:1fr}
+  .util .motto{display:none}.util .wrap{justify-content:center}
+}
+.dswitch{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:180;display:flex;gap:4px;padding:5px;border-radius:999px;background:rgba(10,14,19,.72);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.dswitch a{min-width:46px;text-align:center;padding:8px 14px;border-radius:999px;font-size:.75rem;font-weight:600;letter-spacing:.08em;color:#c5d0da}
+.dswitch a.on,.dswitch a:hover{background:var(--or);color:#fff}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition-duration:.01ms!important;transition-delay:0ms!important}
+  .hero video{transform:none!important}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="car" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></symbol>
+  <symbol id="train" viewBox="0 0 24 24"><path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"/><path d="m9 15-1-1"/><path d="m15 15 1-1"/><path d="M9 19c-2.8 0-5-2.2-5-5v-4a8 8 0 0 1 16 0v4c0 2.8-2.2 5-5 5Z"/><path d="m8 19-2 3"/><path d="m16 19 2 3"/></symbol>
+  <symbol id="plane" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></symbol>
+  <symbol id="chair" viewBox="0 0 24 24"><path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3"/><path d="M3 16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z"/><path d="M5 18v2"/><path d="M19 18v2"/></symbol>
+  <symbol id="med" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></symbol>
+  <symbol id="sprout" viewBox="0 0 24 24"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></symbol>
+  <symbol id="build" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></symbol>
+  <symbol id="arr" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+  <symbol id="up" viewBox="0 0 24 24"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></symbol>
+  <symbol id="mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></symbol>
+  <symbol id="tel" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+  <symbol id="menu" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></symbol>
+</svg>
+
+<div class="progress" id="progress"></div>
+
+<header id="hdr">
+  <div class="util">
+    <div class="wrap">
+      <span class="motto">Již 20 let na trhu</span>
+      <div class="r">
+        <a class="ct em" href="mailto:office@dratprogram.cz"><svg class="i"><use href="#mail"/></svg>office@dratprogram.cz</a>
+        <a class="ct" href="tel:+420702172252"><svg class="i"><use href="#tel"/></svg>+420 702 172 252</a>
+        <div class="lang">
+          <a class="on" href="https://www.dratprogram.cz">CZ</a>
+          <a href="https://www.dratprogram.sk">SK</a>
+          <a href="https://www.draht-programm.de">DE</a>
+          <a href="https://www.dratprogram.cz/en">EN</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap nav">
+    <a class="logo" href="#" title="Drátěný program"><img src="assets/logo-desktop.png" alt="Drátěný program"></a>
+    <nav class="menu">
+      <a href="https://www.dratprogram.cz/reference/">Reference</a>
+      <a href="https://www.dratprogram.cz/o-nas">O nás</a>
+      <a href="https://www.dratprogram.cz/produkty">Produkty</a>
+      <a href="https://www.dratprogram.cz/sluzby">Služby</a>
+      <a href="https://www.dratprogram.cz/technologie">Technologie</a>
+      <a href="https://www.dratprogram.cz/kontakty">Kontakty</a>
+    </nav>
+    <a class="btn btn-or" href="https://www.dratprogram.cz/kontakty">Kontakty <svg class="i"><use href="#arr"/></svg></a>
+    <button class="burger" id="burger" aria-label="Menu"><svg class="i"><use href="#menu"/></svg></button>
+  </div>
+</header>
+
+<div class="ov" id="ov">
+  <button class="x" id="xbtn" aria-label="Zavřít">&times;</button>
+  <a class="l" href="https://www.dratprogram.cz/reference/">Reference</a>
+  <a class="l" href="https://www.dratprogram.cz/o-nas">O nás</a>
+  <a class="l" href="https://www.dratprogram.cz/produkty">Produkty</a>
+  <a class="l" href="https://www.dratprogram.cz/sluzby">Služby</a>
+  <a class="l" href="https://www.dratprogram.cz/technologie">Technologie</a>
+  <a class="l" href="https://www.dratprogram.cz/kontakty">Kontakty</a>
+  <div class="ct"><a href="mailto:office@dratprogram.cz">office@dratprogram.cz</a><a href="tel:+420702172252">+420 702 172 252</a></div>
+</div>
+
+<main>
+<section class="hero" id="hero">
+  <video id="hv" muted autoplay loop playsinline preload="auto"><source src="assets/index-video-2.mp4" type="video/mp4"></video>
+  <div class="wrap hero-in">
+    <div class="eyebrow">Již 20 let na trhu</div>
+    <h1 id="h1">Využíváme moderních technologií, umožňujících <em>ohýbání drátů</em> do téměř jakéhokoliv tvaru</h1>
+    <div class="cta">
+      <a class="btn btn-or" href="https://www.dratprogram.cz/produkty">Produkty <svg class="i"><use href="#arr"/></svg></a>
+      <a class="btn btn-gh" href="https://www.dratprogram.cz/kontakty">Kontakty</a>
+    </div>
+  </div>
+  <a class="scroll" href="#odvetvi"><i></i>Scroll</a>
+</section>
+
+<section class="sec" id="odvetvi">
+  <div class="wrap">
+    <div class="ind-head">
+      <h2 class="rv">Naše výrobky dodáváme do mnoha <span>průmyslových odvětví</span></h2>
+    </div>
+    <div class="grid">
+      <a class="card rv" style="--d:0" href="https://www.dratprogram.cz/produkty/automobilovy-prumysl"><div class="top"><div class="ico"><svg class="i"><use href="#car"/></svg></div><span class="num">01</span></div><h3>Automobilový<br>průmysl</h3><span class="go"><svg class="i"><use href="#up"/></svg></span></a>
+      <a class="card rv" style="--d:1" href="https://www.dratprogram.cz/produkty/vlaky-autobusy"><div class="top"><div class="ico"><svg class="i"><use href="#train"/></svg></div><span class="num">02</span></div><h3>Vlaky<br>autobusy</h3><span class="go"><svg class="i"><use href="#up"/></svg></span></a>
+      <a class="card rv" style="--d:2" href="https://www.dratprogram.cz/produkty/letecky-prumysl"><div class="top"><div class="ico"><svg class="i"><use href="#plane"/></svg></div><span class="num">03</span></div><h3>Letecký<br>průmysl</h3><span class="go"><svg class="i"><use href="#up"/></svg></span></a>
+      <a class="card rv" style="--d:3" href="https://www.dratprogram.cz/produkty/nabytkarstvi"><div class="top"><div class="ico"><svg class="i"><use href="#chair"/></svg></div><span class="num">04</span></div><h3>Nábytkářství a vybavení<br>prodejen</h3><span class="go"><svg class="i"><use href="#up"/></svg></span></a>
+      <a class="card rv" style="--d:0" href="https://www.dratprogram.cz/produkty/zdravotnictvi"><div class="top"><div class="ico"><svg class="i"><use href="#med"/></svg></div><span class="num">05</span></div><h3>Zdravotnictví</h3><span class="go"><svg class="i"><use href="#up"/></svg></span></a>
+      <a class="card rv" style="--d:1" href="https://www.dratprogram.cz/produkty/zemedelstvi"><div class="top"><div class="ico"><svg class="i"><use href="#sprout"/></svg></div><span class="num">06</span></div><h3>Zemědělství a<br>zahrádkařství</h3><span class="go"><svg class="i"><use href="#up"/></svg></span></a>
+      <a class="card rv" style="--d:2" href="https://www.dratprogram.cz/produkty/stavebni-prumysl"><div class="top"><div class="ico"><svg class="i"><use href="#build"/></svg></div><span class="num">07</span></div><h3>Stavební<br>průmysl</h3><span class="go"><svg class="i"><use href="#up"/></svg></span></a>
+    </div>
+  </div>
+</section>
+
+<section class="sec mach">
+  <div class="wrap">
+    <div class="mhead rv" id="mhead">
+      <h2>Vše vyrábíme na vlastních strojích</h2>
+      <div class="ul"></div>
+    </div>
+    <div class="stack">
+      <article class="mc" style="--i:0">
+        <div class="pic"><b>01</b><img data-par="-0.08" src="assets/ohybacka.png" alt="CNC 3D ohýbačka drátů"></div>
+        <div class="txt">
+          <span class="tag">Stroj 01</span>
+          <h2>Ohýbání drátů 2-16 mm</h2>
+          <p>Ohýbáme dráty (2–16 mm) na moderních CNC 3D ohýbačkách. S vysokou přesností se věnujeme sériové i kusové výrobě.</p>
+          <a class="btn btn-or" href="https://www.dratprogram.cz/video/video-ohybani"><span class="play"><svg class="i"><use href="#play"/></svg></span>Sleduj video</a>
+        </div>
+      </article>
+      <article class="mc" style="--i:1">
+        <div class="pic"><b>02</b><img data-par="-0.08" src="assets/svarovacka.png" alt="Bodová svářečka drátů"></div>
+        <div class="txt">
+          <span class="tag">Stroj 02</span>
+          <h2>Svařování drátů bodováním</h2>
+          <p>Bodujeme dráty na jedno a více bodových zařízeních.</p>
+          <a class="btn btn-or" href="https://www.dratprogram.cz/video/video-svarovani"><span class="play"><svg class="i"><use href="#play"/></svg></span>Sleduj video</a>
+        </div>
+      </article>
+      <article class="mc" style="--i:2">
+        <div class="pic"><b>03</b><img data-par="-0.08" src="assets/lisovacka.png" alt="Výstředníkový lis"></div>
+        <div class="txt">
+          <span class="tag">Stroj 03</span>
+          <h2>Lisování</h2>
+          <p>Ohýbáme, lisujeme, tvarujeme dráty na výstředníkových lisech v rozmezí 10-100 tun.</p>
+          <a class="btn btn-or" href="https://www.dratprogram.cz/video/video-lisovani"><span class="play"><svg class="i"><use href="#play"/></svg></span>Sleduj video</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fg">
+      <div>
+        <a class="logo" style="display:inline-block" href="#"><img src="assets/logo-footer.png" alt="Drátěný program" style="height:56px"></a>
+        <p class="mt">Již 20 let na trhu</p>
+      </div>
+      <div>
+        <h4>Drátěny program s.r.o.</h4>
+        <p>Vrchlického 705</p><p>411 17 Libochovice</p><p>IČ: 254 89 828</p><p>DIČ: CZ 254 89 828</p>
+      </div>
+      <div>
+        <h4>O nás</h4>
+        <a href="https://www.dratprogram.cz/o-nas">O společnosti</a>
+        <a href="https://www.dratprogram.cz/kontakty">Kontakty</a>
+        <a href="https://www.dratprogram.cz/o-nas/certifikat-iso">Certifikát ISO</a>
+        <a href="https://www.dratprogram.cz/o-nas/certifikat-svarovani">Certifikát svařování</a>
+      </div>
+      <div>
+        <h4>Kontakt</h4>
+        <a href="mailto:office@dratprogram.cz">office@dratprogram.cz</a>
+        <a href="tel:+420702172252">+420 702 172 252</a>
+      </div>
+    </div>
+  </div>
+  <div class="copy"><div class="wrap">© Copyright 2003-2025 Drátěny program s.r.o.</div></div>
+</footer>
+<nav class="dswitch" aria-label="Návrh"><a class="on" href="navrh-1-forge.html">01</a><a href="navrh-2-precision.html">02</a></nav>
+
+<script>
+(function(){
+  var rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // split headline
+  var n = 0;
+  function wrap(node){
+    Array.from(node.childNodes).forEach(function(c){
+      if(c.nodeType===3){
+        var f=document.createDocumentFragment();
+        c.textContent.split(/(\s+)/).forEach(function(t){
+          if(!t) return;
+          if(/^\s+$/.test(t)) f.appendChild(document.createTextNode(' '));
+          else { var w=document.createElement('span');w.className='w';var s=document.createElement('span');s.style.setProperty('--n',n++);s.textContent=t;w.appendChild(s);f.appendChild(w); }
+        });
+        node.replaceChild(f,c);
+      } else if(c.nodeType===1) wrap(c);
+    });
+  }
+  wrap(document.getElementById('h1'));
+  requestAnimationFrame(function(){ setTimeout(function(){document.body.classList.add('loaded')},60) });
+
+  // reveal
+  var io = new IntersectionObserver(function(es){es.forEach(function(e){ if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)} })},{threshold:.15,rootMargin:'0px 0px -6% 0px'});
+  document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+
+  // spotlight
+  document.querySelectorAll('.card').forEach(function(c){
+    c.addEventListener('pointermove',function(e){var r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px')});
+  });
+
+  // scroll effects
+  var hdr=document.getElementById('hdr'),pg=document.getElementById('progress'),hv=document.getElementById('hv'),hero=document.getElementById('hero');
+  var pars=Array.from(document.querySelectorAll('[data-par]')),ticking=false;
+  function update(){
+    var y=scrollY,h=document.documentElement.scrollHeight-innerHeight;
+    pg.style.transform='scaleX('+(h>0?y/h:0)+')';
+    hdr.classList.toggle('solid',y>40);
+    if(!rm){
+      if(y<innerHeight*1.2) hv.style.transform='translate3d(0,'+(y*.18)+'px,0) scale('+(1+Math.min(y/innerHeight,1)*.06)+')';
+      pars.forEach(function(el){
+        var r=el.parentElement.getBoundingClientRect();
+        if(r.bottom<0||r.top>innerHeight) return;
+        var d=(r.top+r.height/2)-innerHeight/2;
+        el.style.transform='translate3d(0,'+(d*parseFloat(el.dataset.par))+'px,0)';
+      });
+    }
+    ticking=false;
+  }
+  addEventListener('scroll',function(){ if(!ticking){ticking=true;requestAnimationFrame(update)} },{passive:true});
+  addEventListener('resize',update);update();
+
+  // mobile menu
+  var ov=document.getElementById('ov');
+  document.getElementById('burger').onclick=function(){ov.classList.add('open')};
+  document.getElementById('xbtn').onclick=function(){ov.classList.remove('open')};
+  ov.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){ov.classList.remove('open')})});
+
+  // video fallback
+  hv.play&&hv.play().catch(function(){});
+})();
+</script>
+</body>
+</html>

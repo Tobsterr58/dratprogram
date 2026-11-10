@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drátěný program</title>
+<meta name="description" content="Využíváme moderních technologií, umožňujících ohýbání drátů do téměř jakéhokoliv tvaru">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+:root{
+  --ink:#0b0d12;--tx:#1a1d24;--mute:#6b7380;--line:#e4e7ec;--bg:#fff;--soft:#f5f6f8;
+  --bl:#1457c9;--bl2:#0e43a0;--or:#ff6f00;
+  --ease:cubic-bezier(.2,.7,.2,1);--pad:clamp(18px,3.6vw,56px)
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--tx);font-family:Inter,system-ui,sans-serif;line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+svg.i{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wrap{max-width:1500px;margin:0 auto;padding:0 var(--pad)}
+
+/* header */
+header{position:fixed;inset:0 0 auto 0;z-index:100;background:rgba(255,255,255,.82);backdrop-filter:blur(16px) saturate(1.5);-webkit-backdrop-filter:blur(16px) saturate(1.5);border-bottom:1px solid transparent;transition:border-color .4s,transform .6s var(--ease)}
+header.line{border-color:var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:78px;gap:24px}
+.logo img{height:46px;width:auto;display:block;transition:transform .5s var(--ease)}
+.logo:hover img{transform:scale(1.04)}
+.menu{display:flex;gap:4px;font-family:"Inter Tight",sans-serif;font-weight:500;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase}
+.menu a{position:relative;padding:10px 16px;color:#2a2f3a;transition:color .3s}
+.menu a::before{content:"";position:absolute;left:50%;bottom:4px;width:5px;height:5px;border-radius:50%;background:var(--bl);transform:translateX(-50%) scale(0);transition:transform .4s var(--ease)}
+.menu a:hover{color:var(--bl)}.menu a:hover::before{transform:translateX(-50%) scale(1)}
+.nr{display:flex;align-items:center;gap:18px}
+.lang{display:flex;gap:2px;font-size:.7rem;font-weight:600;letter-spacing:.08em}
+.lang a{padding:4px 7px;border-radius:6px;color:#8a92a0}
+.lang a.on,.lang a:hover{color:var(--ink);background:var(--soft)}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:12px 22px;border:1px solid var(--ink);border-radius:999px;font-family:"Inter Tight",sans-serif;font-weight:500;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:background .4s,color .4s,transform .4s var(--ease)}
+.pill:hover{background:var(--ink);color:#fff;transform:translateY(-2px)}
+.pill svg{transition:transform .4s var(--ease)}.pill:hover svg{transform:rotate(45deg)}
+.burger{display:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:#fff;cursor:pointer;align-items:center;justify-content:center;font-size:1.25rem}
+.ov{position:fixed;inset:0;z-index:150;background:var(--bl);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:var(--pad);transform:translateY(-100%);transition:transform .8s var(--ease)}
+.ov.open{transform:none}
+.ov a.l{font-family:"Inter Tight",sans-serif;font-weight:300;text-transform:uppercase;font-size:clamp(2.2rem,10vw,4rem);line-height:1.3;letter-spacing:-.03em}
+.ov .x{position:absolute;top:18px;right:18px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:none;color:#fff;font-size:1.4rem;cursor:pointer}
+.ov .ct{margin-top:30px;display:flex;flex-direction:column;opacity:.8;font-size:.95rem}
+
+/* hero */
+.hero{position:relative;padding-top:120px}
+.gl{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(to right,var(--line) 1px,transparent 1px);background-size:calc((100% - 2*var(--pad))/4) 100%;background-position:var(--pad) 0;opacity:.75;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+h1{font-family:"Inter Tight",sans-serif;font-weight:300;text-transform:uppercase;letter-spacing:-.048em;line-height:1;font-size:clamp(2.1rem,4.3vw,5.2rem);color:var(--ink);position:relative}
+@media (max-width:760px){h1 .ln{display:inline}h1 .ln>span{display:inline}}
+h1 b{font-weight:500;color:var(--bl)}
+h1 .ln{display:block;overflow:hidden;padding-bottom:.1em;margin-bottom:-.1em}
+h1 .ln>span{display:block;transform:translateY(105%);transition:transform 1.2s var(--ease);transition-delay:calc(var(--n)*110ms + 150ms)}
+.loaded h1 .ln>span{transform:none}
+.vp{display:inline-block;vertical-align:middle;width:1.9em;height:.78em;border-radius:999px;overflow:hidden;margin:0 .12em;position:relative;top:-.04em;background:var(--ink)}
+.vp video{width:100%;height:100%;object-fit:cover;display:block}
+.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;align-items:center;margin:clamp(24px,3vw,40px) 0 clamp(22px,2.4vw,34px);position:relative;opacity:0;transform:translateY(20px);transition:all 1s var(--ease) 1s}
+.loaded .meta{opacity:1;transform:none}
+.badge{display:flex;align-items:center;gap:14px;grid-column:1/3}
+.badge .c{width:84px;height:84px;border-radius:50%;background:var(--bl);color:#fff;display:grid;place-items:center;text-align:center;font-family:"Inter Tight";font-size:.7rem;line-height:1.15;font-weight:500;text-transform:uppercase;letter-spacing:.04em;box-shadow:0 0 0 0 rgba(20,87,201,.5);animation:ring 2.8s infinite}
+@keyframes ring{70%{box-shadow:0 0 0 18px rgba(20,87,201,0)}100%{box-shadow:0 0 0 0 rgba(20,87,201,0)}}
+.badge .c b{font-size:1.9rem;font-weight:300;letter-spacing:-.04em}
+.badge p{font-family:"Inter Tight";font-weight:300;font-size:clamp(1.3rem,2vw,1.9rem);letter-spacing:-.02em;font-style:italic}
+.chips{grid-column:3/5;display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.chip{display:inline-flex;align-items:center;gap:10px;padding:11px 18px;border-radius:999px;background:var(--soft);font-size:.85rem;font-weight:500;transition:background .3s,color .3s}
+.chip svg{color:var(--bl);transition:color .3s}
+.chip:hover{background:var(--bl);color:#fff}.chip:hover svg{color:#fff}
+
+/* expanding video */
+.vwrap{--p:0;padding:0 calc((1 - var(--p)) * var(--pad));position:relative}
+.vframe{position:relative;height:min(82vh,860px);min-height:420px;border-radius:calc((1 - var(--p)) * 36px);overflow:hidden;background:var(--ink);isolation:isolate}
+.vframe video{position:absolute;inset:-8% 0;width:100%;height:116%;object-fit:cover;will-change:transform;z-index:-1}
+.vframe::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.4));z-index:0}
+.vframe .sc{position:absolute;left:var(--pad);bottom:28px;z-index:2;color:#fff;display:flex;align-items:center;gap:14px;font-family:"Inter Tight";font-size:.75rem;text-transform:uppercase;letter-spacing:.16em;font-weight:500}
+.vframe .sc span{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.6);display:grid;place-items:center;animation:bob 2s var(--ease) infinite}
+@keyframes bob{50%{transform:translateY(6px)}}
+
+/* sections */
+.sec{padding:clamp(80px,11vw,160px) 0}
+.sh{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;align-items:start;margin-bottom:clamp(40px,5vw,70px)}
+.tag{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--bl);color:var(--bl);padding:5px 14px;border-radius:999px;font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;font-family:"Inter Tight";justify-self:start}
+.sh .idx{justify-self:end;grid-column:4;font-family:"Inter Tight";font-size:.8rem;color:var(--mute);letter-spacing:.1em}
+h2{font-family:"Inter Tight",sans-serif;font-weight:300;text-transform:uppercase;letter-spacing:-.04em;line-height:1.02;font-size:clamp(2rem,4.6vw,4.4rem);color:var(--ink)}
+.sh h2{grid-column:2/5;grid-row:1/3}
+h2 b{font-weight:500;color:var(--bl)}
+
+.cells{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.cell{position:relative;min-height:300px;padding:28px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;isolation:isolate;transition:color .5s}
+.cell::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--bl);transform:translateY(101%);transition:transform .7s var(--ease);border-radius:60% 60% 0 0/22% 22% 0 0}
+.cell:hover::before{transform:none;border-radius:0}
+.cell:hover{color:#fff}
+.cell .top{display:flex;justify-content:space-between;align-items:flex-start}
+.cell .ic{width:68px;height:68px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:28px;color:var(--bl);background:#fff;transition:all .5s var(--ease)}
+.cell:hover .ic{background:#fff;border-color:#fff;transform:scale(1.08) rotate(-8deg)}
+.cell .n{font-family:"Inter Tight";font-size:.8rem;color:var(--mute);letter-spacing:.1em;transition:color .4s}
+.cell:hover .n{color:rgba(255,255,255,.7)}
+.cell h3{font-family:"Inter Tight";font-weight:400;font-size:clamp(1.4rem,2vw,1.9rem);line-height:1.1;letter-spacing:-.025em;text-transform:uppercase}
+.cell .ar{position:absolute;right:24px;bottom:26px;font-size:26px;opacity:0;transform:translate(-10px,10px);transition:all .5s var(--ease)}
+.cell:hover .ar{opacity:1;transform:none}
+.cell.cta{background:var(--ink);color:#fff;border-color:var(--ink)}
+.cell.cta::before{background:var(--or)}
+.cell.cta h3{font-weight:300}
+.cell.cta .ar{opacity:1;transform:none}
+
+/* machines */
+.blue{margin:0 var(--pad);border-radius:36px;background:var(--bl);color:#fff;padding:clamp(70px,9vw,130px) 0;position:relative;overflow:hidden;isolation:isolate}
+.blue::before{content:"";position:absolute;inset:0;z-index:-1;background-image:linear-gradient(to right,rgba(255,255,255,.1) 1px,transparent 1px);background-size:calc(100%/4) 100%}
+.blue::after{content:"";position:absolute;right:-20%;top:-40%;width:70%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 65%);z-index:-1;animation:float 14s ease-in-out infinite}
+@keyframes float{50%{transform:translate(-8%,10%)}}
+.blue h2{color:#fff;text-align:center;max-width:14em;margin:0 auto}
+.tabs{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:clamp(30px,4vw,50px) 0}
+.tab{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.45);background:none;color:#fff;padding:12px 22px;border-radius:999px;font-family:"Inter Tight";font-size:.82rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .4s,color .4s}
+.tab i{position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--or);transform:scaleX(0);transform-origin:0 50%}
+.tab.on{background:#fff;color:var(--bl2)}
+.tab.on i{animation:fill 8s linear forwards}
+.paused .tab.on i{animation-play-state:paused}
+@keyframes fill{to{transform:scaleX(1)}}
+.panels{display:grid}
+.panel{grid-area:1/1;display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(24px,4vw,70px);align-items:center;opacity:0;visibility:hidden;transform:translateY(24px);transition:opacity .7s var(--ease),transform .9s var(--ease),visibility 0s .7s}
+.panel.on{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+.panel .t h3{font-family:"Inter Tight";font-weight:300;text-transform:uppercase;font-size:clamp(2rem,4.2vw,3.8rem);letter-spacing:-.04em;line-height:1.02}
+.panel .t p{margin:22px 0 32px;max-width:28em;font-size:1.1rem;font-weight:300;opacity:.92}
+.btn-w{display:inline-flex;align-items:center;gap:12px;background:#fff;color:var(--bl2);padding:14px 26px;border-radius:999px;font-weight:600;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;transition:transform .4s var(--ease),background .3s,color .3s}
+.btn-w:hover{transform:translateY(-3px);background:var(--or);color:#fff}
+.btn-w .pl{width:26px;height:26px;border-radius:50%;background:var(--bl);color:#fff;display:grid;place-items:center;font-size:12px}
+.btn-w:hover .pl{background:#fff;color:var(--or)}
+.panel .im{position:relative;aspect-ratio:1/.9;max-height:520px;border-radius:28px;background:#fff;display:grid;place-items:center;overflow:hidden;box-shadow:0 50px 80px -40px rgba(0,0,40,.6)}
+.panel .im img{height:82%;width:auto;mix-blend-mode:multiply;transform:scale(.92);transition:transform 1.6s var(--ease)}
+.panel.on .im img{transform:scale(1)}
+.panel .im .nn{position:absolute;left:22px;top:14px;font-family:"Inter Tight";font-size:clamp(4rem,9vw,8rem);font-weight:200;color:rgba(20,87,201,.12);line-height:1}
+
+/* footer */
+footer{background:var(--ink);color:#fff;margin-top:clamp(70px,9vw,130px);padding-top:clamp(60px,7vw,100px);overflow:hidden}
+.fg{display:grid;grid-template-columns:repeat(4,1fr);gap:30px;padding-bottom:clamp(40px,6vw,80px)}
+.fg h4{font-family:"Inter Tight";font-weight:500;text-transform:uppercase;font-size:.78rem;letter-spacing:.14em;margin-bottom:18px;color:#7d8696}
+.fg p,.fg a{display:block;color:#d6dbe3;line-height:1.95;font-size:.98rem}
+.fg a:hover{color:var(--or)}
+.fg .lg{display:inline-block;background:#fff;border-radius:12px;padding:5px 12px;line-height:0}
+.fg .lg img{height:52px}
+.fg .mt{margin-top:16px;color:#9aa3b2;font-style:italic;font-weight:300}
+.word{font-family:"Inter Tight";font-weight:600;text-transform:uppercase;letter-spacing:-.05em;line-height:.8;white-space:nowrap;font-size:clamp(3rem,14.2vw,15rem);color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.18);text-align:center;margin:0 -2vw;transform:translateY(12%);user-select:none}
+.copy{border-top:1px solid rgba(255,255,255,.1);padding:22px 0;color:#7d8696;font-size:.82rem;position:relative;background:var(--ink)}
+
+/* reveal */
+.js .rv{opacity:0;transform:translateY(40px);transition:opacity 1s var(--ease),transform 1.1s var(--ease);transition-delay:calc(var(--d,0)*80ms)}
+.js .rv.in{opacity:1;transform:none}
+
+@media (max-width:1100px){
+  .menu,.nr .lang,.nr .pill{display:none}
+  .burger{display:flex}
+  .cells{grid-template-columns:repeat(2,1fr)}
+  .fg{grid-template-columns:1fr 1fr}
+  .sh h2{grid-column:1/5;grid-row:2}
+  .sh .idx{grid-column:4;grid-row:1}
+  .meta{grid-template-columns:1fr}.badge,.chips{grid-column:1}.chips{justify-content:flex-start}
+  .panel{grid-template-columns:1fr}
+  .panel .im{max-height:420px;aspect-ratio:1/.8}
+}
+@media (max-width:620px){
+  .cells{grid-template-columns:1fr}.cell{min-height:220px}
+  .fg{grid-template-columns:1fr}
+  .blue{border-radius:24px}
+  .tab{padding:10px 16px;font-size:.72rem}
+  .vp{display:none}
+}
+.dswitch{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:180;display:flex;gap:4px;padding:5px;border-radius:999px;background:rgba(255,255,255,.86);border:1px solid var(--line);box-shadow:0 12px 30px -16px rgba(11,13,18,.5);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.dswitch a{min-width:46px;text-align:center;padding:8px 14px;border-radius:999px;font-size:.75rem;font-weight:600;letter-spacing:.08em;color:#5c6572}
+.dswitch a.on,.dswitch a:hover{background:var(--bl);color:#fff}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition-duration:.01ms!important;transition-delay:0ms!important}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="car" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></symbol>
+  <symbol id="train" viewBox="0 0 24 24"><path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"/><path d="m9 15-1-1"/><path d="m15 15 1-1"/><path d="M9 19c-2.8 0-5-2.2-5-5v-4a8 8 0 0 1 16 0v4c0 2.8-2.2 5-5 5Z"/><path d="m8 19-2 3"/><path d="m16 19 2 3"/></symbol>
+  <symbol id="plane" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></symbol>
+  <symbol id="chair" viewBox="0 0 24 24"><path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3"/><path d="M3 16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z"/><path d="M5 18v2"/><path d="M19 18v2"/></symbol>
+  <symbol id="med" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></symbol>
+  <symbol id="sprout" viewBox="0 0 24 24"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></symbol>
+  <symbol id="build" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></symbol>
+  <symbol id="up" viewBox="0 0 24 24"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></symbol>
+  <symbol id="down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m6 13 6 6 6-6"/></symbol>
+  <symbol id="mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></symbol>
+  <symbol id="tel" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+  <symbol id="menu" viewBox="0 0 24 24"><path d="M4 8h16"/><path d="M4 16h16"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></symbol>
+</svg>
+
+<header id="hdr">
+  <div class="wrap nav">
+    <a class="logo" href="#" title="Drátěný program"><img src="assets/logo-desktop.png" alt="Drátěný program"></a>
+    <nav class="menu">
+      <a href="https://www.dratprogram.cz/reference/">Reference</a>
+      <a href="https://www.dratprogram.cz/o-nas">O nás</a>
+      <a href="https://www.dratprogram.cz/produkty">Produkty</a>
+      <a href="https://www.dratprogram.cz/sluzby">Služby</a>
+      <a href="https://www.dratprogram.cz/technologie">Technologie</a>
+      <a href="https://www.dratprogram.cz/kontakty">Kontakty</a>
+    </nav>
+    <div class="nr">
+      <div class="lang">
+        <a class="on" href="https://www.dratprogram.cz">CZ</a>
+        <a href="https://www.dratprogram.sk">SK</a>
+        <a href="https://www.draht-programm.de">DE</a>
+        <a href="https://www.dratprogram.cz/en">EN</a>
+      </div>
+      <a class="pill" href="tel:+420702172252">+420 702 172 252 <svg class="i"><use href="#up"/></svg></a>
+      <button class="burger" id="burger" aria-label="Menu"><svg class="i"><use href="#menu"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<div class="ov" id="ov">
+  <button class="x" id="xbtn" aria-label="Zavřít">&times;</button>
+  <a class="l" href="https://www.dratprogram.cz/reference/">Reference</a>
+  <a class="l" href="https://www.dratprogram.cz/o-nas">O nás</a>
+  <a class="l" href="https://www.dratprogram.cz/produkty">Produkty</a>
+  <a class="l" href="https://www.dratprogram.cz/sluzby">Služby</a>
+  <a class="l" href="https://www.dratprogram.cz/technologie">Technologie</a>
+  <a class="l" href="https://www.dratprogram.cz/kontakty">Kontakty</a>
+  <div class="ct"><a href="mailto:office@dratprogram.cz">office@dratprogram.cz</a><a href="tel:+420702172252">+420 702 172 252</a></div>
+</div>
+
+<main>
+<section class="hero">
+  <div class="gl"></div>
+  <div class="wrap">
+    <h1 id="h1">
+      <span class="ln" style="--n:0"><span>Využíváme moderních</span></span>
+      <span class="ln" style="--n:1"><span>technologií, <span class="vp"><video muted autoplay loop playsinline preload="auto"><source src="assets/index-video-2.mp4" type="video/mp4"></video></span></span></span>
+      <span class="ln" style="--n:2"><span>umožňujících <b>ohýbání drátů</b></span></span>
+      <span class="ln" style="--n:3"><span>do téměř jakéhokoliv tvaru</span></span>
+    </h1>
+    <div class="meta">
+      <div class="badge"><div class="c"><span><b>20</b><br>let</span></div><p>Již 20 let na trhu</p></div>
+      <div class="chips">
+        <a class="chip" href="mailto:office@dratprogram.cz"><svg class="i"><use href="#mail"/></svg>office@dratprogram.cz</a>
+        <a class="chip" href="tel:+420702172252"><svg class="i"><use href="#tel"/></svg>+420 702 172 252</a>
+      </div>
+    </div>
+  </div>
+  <div class="vwrap" id="vwrap">
+    <div class="vframe">
+      <video id="hv" muted autoplay loop playsinline preload="auto"><source src="assets/index-video-2.mp4" type="video/mp4"></video>
+      <a class="sc" href="#odvetvi"><span><svg class="i"><use href="#down"/></svg></span>Scroll</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="odvetvi">
+  <div class="wrap">
+    <div class="sh">
+      <span class="tag rv">Produkty</span><span class="idx rv">01</span>
+      <h2 class="rv" style="--d:1">Naše výrobky dodáváme do mnoha <b>průmyslových odvětví</b></h2>
+    </div>
+    <div class="cells">
+      <a class="cell rv" style="--d:0" href="https://www.dratprogram.cz/produkty/automobilovy-prumysl"><div class="top"><div class="ic"><svg class="i"><use href="#car"/></svg></div><span class="n">01</span></div><h3>Automobilový<br>průmysl</h3><svg class="i ar"><use href="#up"/></svg></a>
+      <a class="cell rv" style="--d:1" href="https://www.dratprogram.cz/produkty/vlaky-autobusy"><div class="top"><div class="ic"><svg class="i"><use href="#train"/></svg></div><span class="n">02</span></div><h3>Vlaky<br>autobusy</h3><svg class="i ar"><use href="#up"/></svg></a>
+      <a class="cell rv" style="--d:2" href="https://www.dratprogram.cz/produkty/letecky-prumysl"><div class="top"><div class="ic"><svg class="i"><use href="#plane"/></svg></div><span class="n">03</span></div><h3>Letecký<br>průmysl</h3><svg class="i ar"><use href="#up"/></svg></a>
+      <a class="cell rv" style="--d:3" href="https://www.dratprogram.cz/produkty/nabytkarstvi"><div class="top"><div class="ic"><svg class="i"><use href="#chair"/></svg></div><span class="n">04</span></div><h3>Nábytkářství a vybavení<br>prodejen</h3><svg class="i ar"><use href="#up"/></svg></a>
+      <a class="cell rv" style="--d:0" href="https://www.dratprogram.cz/produkty/zdravotnictvi"><div class="top"><div class="ic"><svg class="i"><use href="#med"/></svg></div><span class="n">05</span></div><h3>Zdravotnictví</h3><svg class="i ar"><use href="#up"/></svg></a>
+      <a class="cell rv" style="--d:1" href="https://www.dratprogram.cz/produkty/zemedelstvi"><div class="top"><div class="ic"><svg class="i"><use href="#sprout"/></svg></div><span class="n">06</span></div><h3>Zemědělství a<br>zahrádkařství</h3><svg class="i ar"><use href="#up"/></svg></a>
+      <a class="cell rv" style="--d:2" href="https://www.dratprogram.cz/produkty/stavebni-prumysl"><div class="top"><div class="ic"><svg class="i"><use href="#build"/></svg></div><span class="n">07</span></div><h3>Stavební<br>průmysl</h3><svg class="i ar"><use href="#up"/></svg></a>
+      <a class="cell cta rv" style="--d:3" href="https://www.dratprogram.cz/produkty"><div class="top"><span class="n">&nbsp;</span></div><h3>Produkty</h3><svg class="i ar"><use href="#up"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<section class="blue" id="stroje">
+  <div class="wrap">
+    <h2 class="rv">Vše vyrábíme na vlastních strojích</h2>
+    <div class="tabs rv" id="tabs" style="--d:1">
+      <button class="tab on"><i></i>Ohýbání drátů 2-16 mm</button>
+      <button class="tab"><i></i>Svařování drátů bodováním</button>
+      <button class="tab"><i></i>Lisování</button>
+    </div>
+    <div class="panels" id="panels">
+      <article class="panel on">
+        <div class="t">
+          <h3>Ohýbání drátů 2-16 mm</h3>
+          <p>Ohýbáme dráty (2–16 mm) na moderních CNC 3D ohýbačkách. S vysokou přesností se věnujeme sériové i kusové výrobě.</p>
+          <a class="btn-w" href="https://www.dratprogram.cz/video/video-ohybani"><span class="pl"><svg class="i"><use href="#play"/></svg></span>Sleduj video</a>
+        </div>
+        <div class="im"><span class="nn">01</span><img src="assets/ohybacka.png" alt="CNC 3D ohýbačka drátů"></div>
+      </article>
+      <article class="panel">
+        <div class="t">
+          <h3>Svařování drátů bodováním</h3>
+          <p>Bodujeme dráty na jedno a více bodových zařízeních.</p>
+          <a class="btn-w" href="https://www.dratprogram.cz/video/video-svarovani"><span class="pl"><svg class="i"><use href="#play"/></svg></span>Sleduj video</a>
+        </div>
+        <div class="im"><span class="nn">02</span><img src="assets/svarovacka.png" alt="Bodová svářečka drátů"></div>
+      </article>
+      <article class="panel">
+        <div class="t">
+          <h3>Lisování</h3>
+          <p>Ohýbáme, lisujeme, tvarujeme dráty na výstředníkových lisech v rozmezí 10-100 tun.</p>
+          <a class="btn-w" href="https://www.dratprogram.cz/video/video-lisovani"><span class="pl"><svg class="i"><use href="#play"/></svg></span>Sleduj video</a>
+        </div>
+        <div class="im"><span class="nn">03</span><img src="assets/lisovacka.png" alt="Výstředníkový lis"></div>
+      </article>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fg">
+      <div><span class="lg"><img src="assets/logo-footer.png" alt="Drátěný program"></span><p class="mt">Již 20 let na trhu</p></div>
+      <div><h4>Drátěny program s.r.o.</h4><p>Vrchlického 705</p><p>411 17 Libochovice</p><p>IČ: 254 89 828</p><p>DIČ: CZ 254 89 828</p></div>
+      <div><h4>O nás</h4>
+        <a href="https://www.dratprogram.cz/o-nas">O společnosti</a>
+        <a href="https://www.dratprogram.cz/kontakty">Kontakty</a>
+        <a href="https://www.dratprogram.cz/o-nas/certifikat-iso">Certifikát ISO</a>
+        <a href="https://www.dratprogram.cz/o-nas/certifikat-svarovani">Certifikát svařování</a>
+      </div>
+      <div><h4>Kontakt</h4><a href="mailto:office@dratprogram.cz">office@dratprogram.cz</a><a href="tel:+420702172252">+420 702 172 252</a></div>
+    </div>
+  </div>
+  <div class="word" aria-hidden="true">Drátěný program</div>
+  <div class="copy"><div class="wrap">© Copyright 2003-2025 Drátěny program s.r.o.</div></div>
+</footer>
+<nav class="dswitch" aria-label="Návrh"><a href="navrh-1-forge.html">01</a><a class="on" href="navrh-2-precision.html">02</a></nav>
+
+<script>
+(function(){
+  var rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  requestAnimationFrame(function(){setTimeout(function(){document.body.classList.add('loaded')},60)});
+
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.15,rootMargin:'0px 0px -6% 0px'});
+  document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+
+  var hdr=document.getElementById('hdr'),vw=document.getElementById('vwrap'),hv=document.getElementById('hv'),tick=false;
+  function update(){
+    var y=scrollY;
+    hdr.classList.toggle('line',y>10);
+    var r=vw.getBoundingClientRect();
+    // expand as the frame travels from the bottom of the viewport to the top
+    var p=Math.min(Math.max((innerHeight*0.95-r.top)/(innerHeight*0.75),0),1);
+    vw.style.setProperty('--p',rm?1:p.toFixed(3));
+    if(!rm&&r.bottom>0&&r.top<innerHeight){
+      var d=(r.top+r.height/2)-innerHeight/2;
+      hv.style.transform='translate3d(0,'+(d*-.12)+'px,0)';
+    }
+    tick=false;
+  }
+  addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(update)}},{passive:true});
+  addEventListener('resize',update);update();
+
+  // tabs
+  var tabs=Array.from(document.querySelectorAll('.tab')),panels=Array.from(document.querySelectorAll('.panel')),cur=0,timer,box=document.querySelector('.blue');
+  function go(i){
+    cur=i;
+    tabs.forEach(function(t,k){t.classList.remove('on');if(k===i){void t.offsetWidth;t.classList.add('on')}});
+    panels.forEach(function(p,k){p.classList.toggle('on',k===i)});
+    restart();
+  }
+  function restart(){clearTimeout(timer);if(rm)return;timer=setTimeout(function(){go((cur+1)%tabs.length)},8000)}
+  tabs.forEach(function(t,i){t.addEventListener('click',function(){go(i)})});
+  var visible=false;
+  new IntersectionObserver(function(e){visible=e[0].isIntersecting;if(visible){restart()}else{clearTimeout(timer)}},{threshold:.3}).observe(box);
+  box.addEventListener('mouseenter',function(){box.classList.add('paused');clearTimeout(timer)});
+  box.addEventListener('mouseleave',function(){box.classList.remove('paused');go(cur)});
+
+  // mobile menu
+  var ov=document.getElementById('ov');
+  document.getElementById('burger').onclick=function(){ov.classList.add('open')};
+  document.getElementById('xbtn').onclick=function(){ov.classList.remove('open')};
+  ov.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){ov.classList.remove('open')})});
+})();
+</script>
+</body>
+</html>
